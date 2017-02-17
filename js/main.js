@@ -7,6 +7,11 @@
 					{id: 'rows', name: 'Rows', value: 12},
 					{id: 'colors', name: 'Colors', value: 6}];
 
+	var RNGCode = [];
+
+	var currentPeg = 0;
+	var currentRow = 0
+
 	var mastermind = {
 		init: function(){
 			var _this = this;
@@ -45,6 +50,7 @@
 
 		initGame: function(){
 			this.createBoard();
+			this.calcRNGCode();
 			this.showControls();
 
 		},
@@ -67,12 +73,49 @@
 				board += '</div>';
 			}
 
-			board += '</div>';
+			board += '<div id="game_controls"></div></div>';
 			section.innerHTML = board;
 		},
 
+		calcRNGCode: function(){
+			for(i=0; i<settings.find(x => x.id == 'pegs').value; i++){
+				newColor = colors[Math.floor(Math.random() * settings.find(x => x.id == 'colors').value)];
+
+				RNGCode.push(newColor);
+			}
+
+			console.log(RNGCode);
+		},
+
 		showControls: function(){
-			
+			var controlsElement = document.getElementById('game_controls');
+
+			for(i=0; i<settings.find(x => x.id == 'colors').value; i++){
+				controlsElement.innerHTML += '<div class="controls_peg" data-setcolor="'+colors[i]+'"></div>';
+			}
+
+			var controlsPegs = document.querySelectorAll('#game_controls .controls_peg');
+
+			for(i=0; i<controlsPegs.length; i++){
+				controlsPegs[i].style.backgroundColor = controlsPegs[i].dataset.setcolor;
+
+				controlsPegs[i].addEventListener('click', function(event){
+					color = event.target.dataset.setcolor;
+
+					//document.querySelector('#game_board .game_row .game_peg').style.backgroundColor = color;
+					targetPeg = document.querySelectorAll('#game_board .game_row')[currentRow].querySelectorAll('.game_peg')[currentPeg];
+					targetPeg.dataset.color = color;
+					targetPeg.style.backgroundColor = color;
+
+					mastermind.next();
+				});
+			}
+		},
+
+		next: function(){
+			if(currentPeg < settings.find(x => x.id == 'pegs').value -1){
+				currentPeg++;
+			}
 		}
 	}
 

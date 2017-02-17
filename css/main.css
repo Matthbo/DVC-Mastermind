@@ -62,6 +62,15 @@ section #game_board > .game_row > .game_peg {
 	border-radius: 50%;
 }
 
+section #game_board > #game_controls > .controls_peg {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	margin: 0 5px;
+	border: 1px solid #000;
+	border-radius: 50%;
+}
+
 footer {
 	margin-top: 20px;
 	text-align: center;
