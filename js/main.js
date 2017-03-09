@@ -1,11 +1,13 @@
 (function(){
 	var section = document.getElementsByTagName('section')[0];
 
-	var colors = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'brown'];
+	var colors = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'brown', 'white'];
 
-	var settings = [{id: 'pegs', name: 'Code Pegs', value: 4},
-					{id: 'rows', name: 'Rows', value: 12},
-					{id: 'colors', name: 'Colors', value: 6}];
+	var settings = [
+		{id: 'pegs', name: 'Code Pegs', value: 4},
+		{id: 'rows', name: 'Rows', value: 12},
+		{id: 'colors', name: 'Colors', value: 6, max: 8}
+	];
 
 	var RNGCode = [];
 
@@ -70,16 +72,24 @@
 					board += '<div class="game_peg"></div>';
 				}
 
-				board += '</div>';
+				// key pegs
+				roundKeyPegs = pegs.value % 2 == 0 ? 0 : 4.5;
+				board += '<div class="key_pegs" style="width: '+ (9 * pegs.value / 2 + roundKeyPegs) +'px">';
+				for(j=0; j<pegs.value; j++){
+					board += '<div class="key_peg"></div>'
+				}
+
+				board += '</div></div>';
 			}
 
-			board += '<div id="game_controls"></div></div>';
+			board += '<div id="game_controls"></div></div><div class="action_buttons"><button class="w3-btn w3-gray" id="undo">Undo</button><button class="w3-btn w3-red" id="reset">Reset</button></div>';
 			section.innerHTML = board;
 		},
 
 		calcRNGCode: function(){
+			var colorSetting = settings.find(x => x.id == 'colors').value < 9 ? settings.find(x => x.id == 'colors').value : settings.find(x => x.id == 'colors').max; 
 			for(i=0; i<settings.find(x => x.id == 'pegs').value; i++){
-				newColor = colors[Math.floor(Math.random() * settings.find(x => x.id == 'colors').value)];
+				newColor = colors[Math.floor(Math.random() * colorSetting)];
 
 				RNGCode.push(newColor);
 			}
@@ -89,33 +99,91 @@
 
 		showControls: function(){
 			var controlsElement = document.getElementById('game_controls');
-
-			for(i=0; i<settings.find(x => x.id == 'colors').value; i++){
+			var colorSetting = settings.find(x => x.id == 'colors').value < 9 ? settings.find(x => x.id == 'colors').value : settings.find(x => x.id == 'colors').max; 
+			
+			for(i=0; i<colorSetting; i++){
 				controlsElement.innerHTML += '<div class="controls_peg" data-setcolor="'+colors[i]+'"></div>';
 			}
 
 			var controlsPegs = document.querySelectorAll('#game_controls .controls_peg');
 
 			for(i=0; i<controlsPegs.length; i++){
-				controlsPegs[i].style.backgroundColor = controlsPegs[i].dataset.setcolor;
-
 				controlsPegs[i].addEventListener('click', function(event){
 					color = event.target.dataset.setcolor;
 
-					//document.querySelector('#game_board .game_row .game_peg').style.backgroundColor = color;
 					targetPeg = document.querySelectorAll('#game_board .game_row')[currentRow].querySelectorAll('.game_peg')[currentPeg];
 					targetPeg.dataset.color = color;
-					targetPeg.style.backgroundColor = color;
 
 					mastermind.next();
 				});
 			}
+
+			document.querySelector('.action_buttons #undo').addEventListener('click', function(){
+				if(currentPeg > 0){
+					currentPeg--;
+					delete document.querySelectorAll('#game_board .game_row')[currentRow].querySelectorAll('.game_peg')[currentPeg].dataset.color;
+				}
+			});
+
+			document.querySelector('.action_buttons #reset').addEventListener('click', function(){
+				mastermind.reset();
+			});
 		},
 
 		next: function(){
 			if(currentPeg < settings.find(x => x.id == 'pegs').value -1){
 				currentPeg++;
+			} else if(currentRow < settings.find(x => x.id == 'rows').value -1) {
+				var pegsSetting = settings.find(x => x.name == 'Code Pegs');
+				var row = document.querySelectorAll('#game_board .game_row')[currentRow];
+				var keyPegs = row.querySelectorAll('.key_pegs .key_peg');
+				var code = RNGCode.slice(0);
+				var correctAmount = 0;
+
+				//check correct pegs
+				for(i=0; i<pegsSetting.value; i++){
+					var peg = row.querySelectorAll('.game_peg')[i];
+					if(peg.dataset.color == code[i]){
+						keyPegs[i].dataset.correct = 2;
+						code[i] = 'correct';
+						correctAmount++;
+					}
+				}
+
+				//check if color is in answer
+				for(i=0; i<pegsSetting.value; i++){
+					var peg = row.querySelectorAll('.game_peg')[i];
+					var codeIndex = code.indexOf(peg.dataset.color);
+					if(codeIndex != -1 && keyPegs[i].dataset.correct != 2){
+						keyPegs[i].dataset.correct = 1;
+						code[codeIndex] = 'in answer';
+					}
+				}
+
+				if(correctAmount == pegsSetting.value){
+					setTimeout(function(){
+						mastermind.reset();
+						alert('You win!');
+					}, 0);
+				} else {
+					currentRow++;
+					currentPeg = 0;	
+				}
+			} else {
+				setTimeout(function(){
+					mastermind.reset();
+					alert('Game Over!');
+				}, 0);
 			}
+		},
+
+		reset: function(full){
+			section.innerHTML = '';
+			RNGCode = [];
+			currentPeg = 0;
+			currentRow = 0;
+
+			this.showSettings();
 		}
 	}
 

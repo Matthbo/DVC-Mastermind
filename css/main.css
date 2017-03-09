@@ -48,9 +48,11 @@ section #settings_form > .row > input {
 
 section #game_board {
 	display: inline-block;
+	margin: 0 20px 20px 0;
 	padding: 5px;
 	border: 1px solid #000;
 	border-radius: 10px;
+	background-color: #ce8d68;
 }
 
 section #game_board > .game_row > .game_peg {
@@ -60,6 +62,68 @@ section #game_board > .game_row > .game_peg {
 	margin: 0 5px;
 	border: 1px solid #000;
 	border-radius: 50%;
+	background-color: #000;
+}
+
+section #game_board > #game_controls > .controls_peg[data-setcolor="red"],
+section #game_board > .game_row > .game_peg[data-color="red"] {
+	background-color: red;
+}
+section #game_board > #game_controls > .controls_peg[data-setcolor="orange"],
+section #game_board > .game_row > .game_peg[data-color="orange"] {
+	background-color: orange;
+}
+section #game_board > #game_controls > .controls_peg[data-setcolor="yellow"],
+section #game_board > .game_row > .game_peg[data-color="yellow"] {
+	background-color: yellow;
+}
+section #game_board > #game_controls > .controls_peg[data-setcolor="green"],
+section #game_board > .game_row > .game_peg[data-color="green"] {
+	background-color: green;
+}
+section #game_board > #game_controls > .controls_peg[data-setcolor="blue"],
+section #game_board > .game_row > .game_peg[data-color="blue"] {
+	background-color: blue;
+}
+section #game_board > #game_controls > .controls_peg[data-setcolor="purple"],
+section #game_board > .game_row > .game_peg[data-color="purple"] {
+	background-color: purple;
+}
+section #game_board > #game_controls > .controls_peg[data-setcolor="brown"],
+section #game_board > .game_row > .game_peg[data-color="brown"] {
+	background-color: brown;
+}
+section #game_board > #game_controls > .controls_peg[data-setcolor="white"],
+section #game_board > .game_row > .game_peg[data-color="white"] {
+	background-color: white;
+}
+
+section #game_board > .game_row > .key_pegs {
+	display: inline-block;
+	font-size: 8px;
+}
+
+section #game_board > .game_row > .key_pegs > .key_peg {
+	display: inline-block;
+	width: 4px;
+	height: 4px;
+	margin-right: 5px;
+	border: 1px solid #000;
+	border-radius: 50%;
+	background-color: #000;
+}
+
+section #game_board > .game_row > .key_pegs > .key_peg[data-correct="1"]{
+	background-color: white;
+}
+section #game_board > .game_row > .key_pegs > .key_peg[data-correct="2"]{
+	background-color: #f44336;
+}
+
+section #game_board > #game_controls {
+	margin-top: 5px;
+	padding-top: 5px;
+	border-top: 1px solid #000;
 }
 
 section #game_board > #game_controls > .controls_peg {
@@ -69,6 +133,14 @@ section #game_board > #game_controls > .controls_peg {
 	margin: 0 5px;
 	border: 1px solid #000;
 	border-radius: 50%;
+}
+
+section .action_buttons {
+	display: inline-block;
+}
+
+section .action_buttons > button {
+	margin-right: 10px;
 }
 
 footer {
@@ -93,5 +165,9 @@ footer #copyleft {
 		padding: 20px;
 		background-color: #fff;
     	box-shadow: 0 2px 8px 0 rgba(0,0,0,0.2);
+	}
+
+	section #game_board {
+		margin-bottom: 0;
 	}
 }
