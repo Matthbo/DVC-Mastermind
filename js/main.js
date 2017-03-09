@@ -73,8 +73,8 @@
 				}
 
 				// key pegs
-				roundKeyPegs = pegs.value % 2 == 0 ? 0 : 4.5;
-				board += '<div class="key_pegs" style="width: '+ (9 * pegs.value / 2 + roundKeyPegs) +'px">';
+				roundKeyPegs = pegs.value % 2 == 0 ? 0 : 6.5;
+				board += '<div class="key_pegs" style="width: '+ (13 * pegs.value / 2 + roundKeyPegs) +'px">';
 				for(j=0; j<pegs.value; j++){
 					board += '<div class="key_peg"></div>'
 				}
