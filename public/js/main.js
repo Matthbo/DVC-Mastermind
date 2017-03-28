@@ -16,7 +16,7 @@
 
 	var mastermind = {
 		init: function(){
-			var _this = this;
+			var self = this;
 
 			this.updateInfo();
 			this.showSettings();
@@ -58,8 +58,8 @@
 		},
 
 		createBoard: function(){
-			var rows = settings.find(x => x.name == 'Rows');
-			var pegs = settings.find(x => x.name == 'Code Pegs');
+			var rows = settings.find(x => x.id == 'rows');
+			var pegs = settings.find(x => x.id == 'pegs');
 
 			section.innerHTML = '';
 
