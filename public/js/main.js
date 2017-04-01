@@ -12,7 +12,7 @@
 	var RNGCode = [];
 
 	var currentPeg = 0;
-	var currentRow = 0
+	var currentRow = 0;
 
 	var mastermind = {
 		init: function(){
@@ -20,6 +20,8 @@
 
 			this.updateInfo();
 			this.showSettings();
+
+			this.sendAJAX('POST', 'api/create_game', function(response){console.log(response)}, 'test=true&otherthing=false&bs=more+pls&why=no');
 		},
 
 		updateInfo: function(){
@@ -184,6 +186,26 @@
 			currentRow = 0;
 
 			this.showSettings();
+		},
+
+		sendAJAX: function(method, url, callback, data = ""){
+			var xmlhttp = new XMLHttpRequest();
+
+	        xmlhttp.onreadystatechange = function() {
+	            if (this.readyState == 4) {
+	                callback(JSON.parse(this.responseText));
+	            }
+	        };
+	        if(method == "POST"){
+		        xmlhttp.open(method, url, true);
+
+				xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+		        xmlhttp.send(data);
+	        } else {
+		        xmlhttp.open(method, url +"?"+ data, true);
+		        xmlhttp.send();
+	        }
 		}
 	}
 
