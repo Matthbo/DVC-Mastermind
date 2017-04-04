@@ -3,6 +3,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Api extends CI_Controller {
 
+	public function __construct(){
+		parent::__construct();
+		$this->load->model('session');
+	}
+
 	private function isGet()
 	{
 		if($this->input->method() === "get") return true;
@@ -39,11 +44,31 @@ class Api extends CI_Controller {
 			$rows = $this->input->post('rows');
 			$colors = $this->input->post('colors');
 
-			
+			$name = md5(microtime());
+
+			$this->session->create($name, $pegs, $rows, $colors);
 
 			return $this->sendJson(array(
 				'status' => 'Success',
-				'test' => $this->input->post()
+				'session_name' => $name
+			));
+		}
+
+		return $this->sendJson(array(
+			'status' => 'Forbidden'
+		), 403);
+	}
+
+	public function get_session()
+	{
+		if($this->isPost()){
+			$session_name = $this->input->post('session_name');
+
+			$isActive = $this->session->exists($session_name);
+
+			return $this->sendJson(array(
+				'status' => 'Success',
+				'is_active' => $isActive
 			));
 		}
 

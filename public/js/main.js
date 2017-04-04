@@ -19,9 +19,9 @@
 			var self = this;
 
 			this.updateInfo();
-			this.showSettings();
+			this.getSession();
 
-			this.sendAJAX('POST', 'api/create_game', function(response){console.log(response)}, 'test=true&otherthing=false&bs=more+pls&why=no');
+			//this.sendAJAX('POST', 'api/create_game', function(response){console.log(response)}, 'test=true&otherthing=false&bs=more+pls&why=no');
 		},
 
 		updateInfo: function(){
@@ -29,6 +29,30 @@
 
 			var date = new Date().getFullYear();
 			cDate.innerHTML += date;
+		},
+
+		getSession: function(){
+			function readCookie(name) {
+			    var nameEQ = name + "=";
+			    var ca = document.cookie.split(';');
+			    for(var i=0;i < ca.length;i++) {
+			        var c = ca[i];
+			        while (c.charAt(0)==' ') c = c.substring(1,c.length);
+			        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+			    }
+			    return null;
+			}
+
+			var session = readCookie('session_name');
+			if(session != null){
+				this.sendAJAX('POST', 'api/get_session', function(result){
+					console.log(result);
+					alert('load game & get rows');
+				}, 'session_name='+session);
+			} else {
+				this.showSettings();
+			}
+
 		},
 
 		showSettings: function(){
@@ -47,8 +71,27 @@
 					settings.find(x => x.id == settingsForm[i].name).value = settingsForm[i].value;
 				}
 
-				mastermind.initGame();
+				mastermind.createSession();
 			}, false);
+
+		},
+
+		createSession: function(){
+			var rows = settings.find(x => x.id == 'rows').value;
+			var pegs = settings.find(x => x.id == 'pegs').value;
+			var colors = settings.find(x => x.id == 'colors').value;
+
+			var data = 'pegs='+pegs+'&rows='+rows+'&colors='+colors;
+
+			this.sendAJAX('POST', 'api/create_game', function(result){
+				if(result.status == "Success") {
+					var date = new Date();
+					date.setFullYear(new Date().getFullYear()+1);
+					document.cookie = 'session_name='+result.session_name+'; expires='+date.toUTCString()+'; path=/DVC-Mastermind';
+
+					mastermind.initGame();
+				} else alert("Couldn't create a session, please try again");
+			}, data);
 
 		},
 
@@ -56,7 +99,6 @@
 			this.createBoard();
 			this.calcRNGCode();
 			this.showControls();
-
 		},
 
 		createBoard: function(){
