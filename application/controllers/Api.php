@@ -6,6 +6,7 @@ class Api extends CI_Controller {
 	public function __construct(){
 		parent::__construct();
 		$this->load->model('session');
+		$this->load->model('step');
 	}
 
 	private function isGet()
@@ -59,6 +60,31 @@ class Api extends CI_Controller {
 		), 403);
 	}
 
+	public function save_step()
+	{
+		if($this->isPost()){
+			$session_name = $this->input->post('session_name');
+			$row = $this->input->post('row');
+			$move = $this->input->post('move');
+
+			$success = $this->step->create($session_name, $row, $move);
+
+			if($success){
+				return $this->sendJson(array(
+					'status' => 'Success'
+				));
+			}
+
+			return $this->sendJson(array(
+				'status' => 'Failed'
+			), 500);
+		}
+
+		return $this->sendJson(array(
+			'status' => 'Forbidden'
+		), 403);
+	}
+
 	public function get_session()
 	{
 		if($this->isPost()){
@@ -69,6 +95,30 @@ class Api extends CI_Controller {
 			return $this->sendJson(array(
 				'status' => 'Success',
 				'is_active' => $isActive
+			));
+		}
+
+		return $this->sendJson(array(
+			'status' => 'Forbidden'
+		), 403);
+	}
+
+	public function load_game()
+	{
+		if($this->isPost()){
+			$session_name = $this->input->post('session_name');
+
+			$results = $this->session->get_steps($session_name);
+
+			$steps = [];
+
+			for($i=0; $i<count($results); $i++){
+				$steps[$results[$i]['row']] = $results[$i]['move'];
+			}
+
+			return $this->sendJson(array(
+				'status' => 'Success',
+				'steps' => $steps
 			));
 		}
 

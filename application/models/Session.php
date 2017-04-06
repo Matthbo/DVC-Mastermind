@@ -23,7 +23,21 @@ class Session extends CI_Model {
 		$query = $this->db->get_where('sessions', array('name' => $name));
 		$result = $query->result_array()[0];
 
-		return isset($result);
+		return !empty($result);
+	}
+
+	public function get_steps($name)
+	{
+		//$session_id = $this->db->get_where('sessions', array('name' => $name))->result_array()[0]['id'];
+
+		$this->db->select('row, move');
+		$this->db->from('sessions');
+		$this->db->where('name', $name);
+		$this->db->join('steps', 'steps.session_id = sessions.id');
+
+		$result = $this->db->get()->result_array();
+
+		return $result;
 	}
 
 }

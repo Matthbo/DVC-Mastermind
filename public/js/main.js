@@ -10,6 +10,7 @@
 	];
 
 	var RNGCode = [];
+	var sessionName = '';
 
 	var currentPeg = 0;
 	var currentRow = 0;
@@ -46,8 +47,15 @@
 			var session = readCookie('session_name');
 			if(session != null){
 				this.sendAJAX('POST', 'api/get_session', function(result){
-					console.log(result);
-					alert('load game & get rows');
+					if(result.status == "Success" && result.is_active){
+						alert('load game & get rows');
+
+						sessionName = session;
+
+						mastermind.initGame(false);
+					} else {
+						this.showSettings();
+					}
 				}, 'session_name='+session);
 			} else {
 				this.showSettings();
@@ -89,15 +97,18 @@
 					date.setFullYear(new Date().getFullYear()+1);
 					document.cookie = 'session_name='+result.session_name+'; expires='+date.toUTCString()+'; path=/DVC-Mastermind';
 
-					mastermind.initGame();
+					sessionName = result.session_name;
+
+					mastermind.initGame(true);
 				} else alert("Couldn't create a session, please try again");
 			}, data);
 
 		},
 
-		initGame: function(){
+		initGame: function(newgame){
 			this.createBoard();
-			this.calcRNGCode();
+			if(newgame) this.calcRNGCode();
+			else this.loadGameData();
 			this.showControls();
 		},
 
@@ -139,6 +150,27 @@
 			}
 
 			console.log(RNGCode);
+		},
+
+		loadGameData: function(){
+			var loadRow = 0;
+
+			this.sendAJAX('POST', 'api/load_game', function(result){
+				if(result.status == "Success"){
+					for(i=0; i < result.steps.length; i++){
+						var savedRow = JSON.parse(result.steps[i]);
+						var row = document.querySelectorAll('#game_board .game_row')[i];
+
+						for(j=0; j<settings.find(x => x.id == 'pegs').value; j++){
+							var savedPegColor = savedRow[j];
+							var peg = row.querySelectorAll('.game_peg')[j];
+
+							peg.dataset.color = savedPegColor;
+						}
+					}
+					currentRow = result.steps.length;
+				} else alert("Couldn't load the saved game, please reload the page!");
+			}, 'session_name='+sessionName);
 		},
 
 		showControls: function(){
@@ -183,10 +215,12 @@
 				var keyPegs = row.querySelectorAll('.key_pegs .key_peg');
 				var code = RNGCode.slice(0);
 				var correctAmount = 0;
+				var jsonRow = {};
 
 				//check correct pegs
 				for(i=0; i<pegsSetting.value; i++){
 					var peg = row.querySelectorAll('.game_peg')[i];
+					jsonRow[i] = peg.dataset.color;
 					if(peg.dataset.color == code[i]){
 						keyPegs[i].dataset.correct = 2;
 						code[i] = 'correct';
@@ -210,6 +244,11 @@
 						alert('You win!');
 					}, 0);
 				} else {
+					var data = 'session_name='+sessionName+'&row='+currentRow+'&move='+JSON.stringify(jsonRow);
+					this.sendAJAX('POST', 'api/save_step', function(result){
+						console.log(result);
+					}, data);
+
 					currentRow++;
 					currentPeg = 0;	
 				}
