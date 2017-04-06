@@ -87,14 +87,19 @@ class Api extends CI_Controller {
 
 	public function get_session()
 	{
-		if($this->isPost()){
-			$session_name = $this->input->post('session_name');
+		if($this->isGet()){
+			$session_name = $this->input->get('session_name');
 
-			$isActive = $this->session->exists($session_name);
+			$result = $this->session->get($session_name);
+
+			$isActive = !empty($result);
 
 			return $this->sendJson(array(
 				'status' => 'Success',
-				'is_active' => $isActive
+				'is_active' => $isActive,
+				'rows' => $result['rows'],
+				'pegs' => $result['pegs'],
+				'colors' => $result['colors']
 			));
 		}
 
@@ -105,8 +110,8 @@ class Api extends CI_Controller {
 
 	public function load_game()
 	{
-		if($this->isPost()){
-			$session_name = $this->input->post('session_name');
+		if($this->isGet()){
+			$session_name = $this->input->get('session_name');
 
 			$results = $this->session->get_steps($session_name);
 

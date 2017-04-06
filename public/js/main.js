@@ -46,11 +46,12 @@
 
 			var session = readCookie('session_name');
 			if(session != null){
-				this.sendAJAX('POST', 'api/get_session', function(result){
+				this.sendAJAX('GET', 'api/get_session', function(result){
 					if(result.status == "Success" && result.is_active){
-						alert('load game & get rows');
-
 						sessionName = session;
+						settings.find(x => x.id == 'pegs').value = result.pegs;
+						settings.find(x => x.id == 'rows').value = result.rows;
+						settings.find(x => x.id == 'colors').value = result.colors;
 
 						mastermind.initGame(false);
 					} else {
@@ -90,7 +91,6 @@
 			var colors = settings.find(x => x.id == 'colors').value;
 
 			var data = 'pegs='+pegs+'&rows='+rows+'&colors='+colors;
-
 			this.sendAJAX('POST', 'api/create_game', function(result){
 				if(result.status == "Success") {
 					var date = new Date();
@@ -155,7 +155,7 @@
 		loadGameData: function(){
 			var loadRow = 0;
 
-			this.sendAJAX('POST', 'api/load_game', function(result){
+			this.sendAJAX('GET', 'api/load_game', function(result){
 				if(result.status == "Success"){
 					for(i=0; i < result.steps.length; i++){
 						var savedRow = JSON.parse(result.steps[i]);
@@ -246,7 +246,7 @@
 				} else {
 					var data = 'session_name='+sessionName+'&row='+currentRow+'&move='+JSON.stringify(jsonRow);
 					this.sendAJAX('POST', 'api/save_step', function(result){
-						console.log(result);
+						if(result.status != "Success") console.log(result);
 					}, data);
 
 					currentRow++;

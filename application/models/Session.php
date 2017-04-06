@@ -18,12 +18,12 @@ class Session extends CI_Model {
 		return $this->db->insert('sessions', $settings);
 	}
 
-	public function exists($name)
+	public function get($name)
 	{
 		$query = $this->db->get_where('sessions', array('name' => $name));
 		$result = $query->result_array()[0];
 
-		return !empty($result);
+		return $result;
 	}
 
 	public function get_steps($name)
