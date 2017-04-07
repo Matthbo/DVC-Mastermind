@@ -21,4 +21,9 @@ class Step extends CI_Model {
     	return !empty($result);
     }
 
+    public function delete_from_session($session_id)
+    {
+    	return $this->db->delete('steps', array('session_id' => $session_id));
+    }
+
 }

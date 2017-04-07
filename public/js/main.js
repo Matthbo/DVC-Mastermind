@@ -55,7 +55,7 @@
 
 						mastermind.initGame(false);
 					} else {
-						this.showSettings();
+						mastermind.showSettings();
 					}
 				}, 'session_name='+session);
 			} else {
@@ -260,13 +260,19 @@
 			}
 		},
 
-		reset: function(full){
+		reset: function(){
 			section.innerHTML = '';
 			RNGCode = [];
 			currentPeg = 0;
 			currentRow = 0;
 
-			this.showSettings();
+			this.sendAJAX("DELETE", 'api/remove_session', function(result){
+				if(result.status == "Success"){
+					mastermind.showSettings();
+					sessionName = '';
+				}
+			}, 'session_name='+sessionName);
+
 		},
 
 		sendAJAX: function(method, url, callback, data = ""){

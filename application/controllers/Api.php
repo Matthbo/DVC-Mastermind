@@ -131,4 +131,23 @@ class Api extends CI_Controller {
 			'status' => 'Forbidden'
 		), 403);
 	}
+
+	public function remove_session()
+	{
+		if($this->isDelete()){
+			$session_name = $this->input->get('session_name');
+
+			$id = $this->session->get($session_name)['id'];
+			$this->session->delete($id);
+			$this->step->delete_from_session($id);
+
+			return $this->sendJson(array(
+				'status' => 'Success'
+			));
+		}
+
+		return $this->sendJson(array(
+			'status' => 'Forbidden'
+		), 403);
+	}
 }

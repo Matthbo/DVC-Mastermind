@@ -21,9 +21,13 @@ class Session extends CI_Model {
 	public function get($name)
 	{
 		$query = $this->db->get_where('sessions', array('name' => $name));
-		$result = $query->result_array()[0];
+		$result = $query->result_array();
+		
+		if(!empty($result[0])){
+			return $result[0];
+		}
 
-		return $result;
+		return null;
 	}
 
 	public function get_steps($name)
@@ -38,6 +42,11 @@ class Session extends CI_Model {
 		$result = $this->db->get()->result_array();
 
 		return $result;
+	}
+
+	public function delete($id)
+	{
+		return $this->db->delete('sessions', array('id' => $id));
 	}
 
 }
